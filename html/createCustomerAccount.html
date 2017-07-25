@@ -21,15 +21,15 @@
         </header>
         <div class="w3-center w3-container">
             <div class="w3-xxlarge w3-margin-top" style="color:grey">Create An Account</div>
-            <form class="w3-medium">
+            <form action="../cgi-bin/createCustomerAccount.py" method="post" class="w3-medium">
                 <label>Name:</label>
-                <input type="text" name="username" class="w3-margin"><br>
+                <input type="text" name="name" class="w3-margin"><br>
                 <label>Email:</label>
                 <input type="text" name="email" class="w3-margin"><br>
                 <label>Password:</label>
-                <input type="password" name="password" class="w3-margin">
+                <input type="password" name="password" class="w3-margin"></br>
+                <button type="submit "class="w3-button w3-blue w3-margin-top">Create Account</button>
             </form>
-            <button class="w3-button w3-blue">Create Account</button>
         </div>
         <footer class="w3-container w3-padding-64 w3-center w3-blue w3-bottom">  
         </footer>
