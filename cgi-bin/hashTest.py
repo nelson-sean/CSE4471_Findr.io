@@ -1,10 +1,12 @@
 import bcrypt
 
-password = b"Hello World!"
+password = "Hello World!"
 
-hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
-if bcrypt.checkpw(password, hashed):
+print(hashed.decode())
+
+if bcrypt.checkpw(password.encode(), hashed):
     print("It Matches!")
     print(str(hashed))
 else:
