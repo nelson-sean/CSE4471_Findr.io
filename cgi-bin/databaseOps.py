@@ -51,6 +51,24 @@ def userExistsInDatabase(cursor, user_email):
     
     return dbreturn
 
+def businessExistsInDatabase(cursor, bus_email):
+
+    # Construct query to check for user email in database
+    query = ("SELECT * "
+                "FROM BUSINESS "
+                "WHERE EMAIL = %(email)s")
+
+    # Execute query against database
+    cursor.execute(query, {"email": bus_email})
+
+    dbreturn = False
+
+    # Retrieve rows from cursor
+    for (NAME, EMAIL, PASSWD_HASH, PROFILE_URL) in cursor:
+        dbreturn=True
+    
+    return dbreturn
+
 def addUserToDatabase(cursor, user_name, user_email, user_passwd):
 
     # Construct insert query
@@ -70,6 +88,27 @@ def addUserToDatabase(cursor, user_name, user_email, user_passwd):
         }
     )
 
+def addBusinessToDatabase(cursor, bus_name, bus_email, bus_passwd, prof_url):
+
+    # Construct insert query
+    query = ("INSERT INTO BUSINESS VALUES( "
+                "%(bus_name)s, "
+                "%(bus_email)s, "
+                "%(bus_passwd)s, "
+                "%(prof_url)s);"
+            )
+
+    # Execute query with provided values
+    cursor.execute(
+        query,
+        {
+            "bus_name": bus_name,
+            "bus_email": bus_email,
+            "bus_passwd": bus_passwd,
+            "prof_url": prof_url
+        }
+    )
+
 def getPasswdHash(cursor, user_email):
 
     query = (
@@ -86,7 +125,26 @@ def getPasswdHash(cursor, user_email):
     for (PASSWD_HASH) in cursor:
         return PASSWD_HASH[0]
 
-def getUserName(cursor, user_email):
+def getBusinessPasswdHash(cursor, bus_email):
+
+    query = (
+        "SELECT PASSWD_HASH "
+        "FROM BUSINESS "
+        "WHERE EMAIL=%(bus_email)s"
+    )
+
+    cursor.execute(
+        query,
+        {"bus_email": bus_email}
+    )
+
+    for (PASSWD_HASH) in cursor:
+        return PASSWD_HASH[0]
+
+
+def getUserName(user_email):
+
+    cnx, cursor = createDatabaseConnection()
 
     query = (
         "SELECT * "
@@ -101,3 +159,58 @@ def getUserName(cursor, user_email):
 
     for (NAME) in cursor:
         return NAME[0]
+
+    cursor.close()
+    cnx.close()
+
+def getBusinessName(email):
+
+    cnx, cursor = createDatabaseConnection()
+
+    query = (
+        "SELECT * "
+        "FROM BUSINESS "
+        "WHERE EMAIL=%(email)s"
+    )
+
+    cursor.execute(
+        query,
+        {"email": email}
+    )
+
+    for (NAME) in cursor:
+        return NAME[0]
+
+    cursor.close()
+    cnx.close()
+
+def getBusinessURL(email):
+
+    cnx, cursor = createDatabaseConnection()
+
+    query = (
+        "SELECT PROFILE_URL "
+        "FROM BUSINESS "
+        "WHERE EMAIL=%(email)s"
+    )
+
+    cursor.execute(
+        query,
+        {"email": email}
+    )
+
+    for (NAME) in cursor:
+        return NAME[0]
+
+    cursor.close()
+    cnx.close()
+
+
+def queryForPosts(cursor):
+
+    query = (
+        "SELECT * "
+        "FROM POST"
+    )
+
+    cursor.execute(query)

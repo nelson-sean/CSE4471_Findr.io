@@ -5,10 +5,15 @@ import cgi
 import cgitb
 from pageCreator import createMessagePage
 from pageCreator import createSuccessPage
+from pageCreator import createBusinessSuccessPage
 from databaseOps import createDatabaseConnection
 from databaseOps import userExistsInDatabase
+from databaseOps import businessExistsInDatabase
 from databaseOps import getPasswdHash
+from databaseOps import getBusinessPasswdHash
 from databaseOps import getUserName
+from databaseOps import getBusinessName
+from databaseOps import getBusinessURL
 
 def main():
 
@@ -19,11 +24,14 @@ def main():
     form = cgi.FieldStorage()
 
     # Retrieve parameters and hash password with bcrypt
-    user_email = form.getvalue('email')
-    user_passwd = form.getvalue('password')
+    email = form.getvalue('email')
+    passwd = form.getvalue('password')
 
-    #user_email = "bort@hotmail.com"
-    #user_passwd = "EatMyShorts"
+    #email = "betsydonuts@comcast.net"
+    #passwd = "WowThatsGood"
+
+    #email = "bort@hotmail.com"
+    #passwd = "EatMyShorts"
 
 
     # Create database connection object and cursor
@@ -34,19 +42,35 @@ def main():
         createMessagePage("Error connecting to database")
         return
 
-    # If user does not exist return error message page and exit
-    if not userExistsInDatabase(cursor, user_email):
-        createMessagePage("Username/Password incorrect")
-        return
+    # If user exists in database attempt to authenticate
+    if userExistsInDatabase(cursor, email):
+
+        # Assuming user does exist retrieve passwd hash from database        
+        db_hash = getPasswdHash(cursor, email)
+
+        # Check given password against hash from database
+        if bcrypt.checkpw(passwd.encode(), db_hash.encode()):
+            createSuccessPage(getUserName(email).split()[0])
+            return
+        else:
+            createMessagePage("Username/Password incorrect")
+            return
+
+    # If business exists in database attempt to authenticate
+    elif businessExistsInDatabase(cursor, email):
+
+        # Assuming user does exist retrieve passwd hash from database        
+        db_hash = getBusinessPasswdHash(cursor, email)
+
+        # Check given password against hash from database
+        if bcrypt.checkpw(passwd.encode(), db_hash.encode()):
+            createBusinessSuccessPage(getBusinessName(email), getBusinessURL(email))
+            return
+        else:
+            createMessagePage("Username/Password incorrect")
+            return
 
 
-    # Assuming user does exist retrieve passwd hash from database        
-    db_hash = getPasswdHash(cursor, user_email)
-
-    if bcrypt.checkpw(user_passwd.encode(), db_hash.encode()):
-        createSuccessPage(getUserName(cursor, user_email).split()[0])
-    else:
-        createMessagePage("Username/Password incorrect")
 
 
 # Execute main method if script is called directly
